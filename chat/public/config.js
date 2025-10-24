@@ -1,6 +1,8 @@
-// 在不同环境中设置后端 Socket 服务地址
-// 默认留空表示同源（本地开发使用 http://localhost:PORT ）
-// 部署到 Vercel 前端 + Render 后端时，填写 Render 服务地址，例如：
-// window.SOCKET_URL = 'https://realtime-chat-room.onrender.com';
+// 客户端配置：用于在Vercel静态站点通过Socket.IO连接远端后端
+// 将下方地址改为你部署的后端Socket服务器域名，例如：
+// window.CHAT_SERVER_URL = "https://your-socket-server.example.com";
+// 留空表示同源（本地开发或前后端同域部署）
+window.CHAT_SERVER_URL = "";
 
-window.SOCKET_URL = window.SOCKET_URL || '';
+// Socket.IO路径（一般保持默认即可）
+window.CHAT_SOCKET_PATH = "/socket.io";

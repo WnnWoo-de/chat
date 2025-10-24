@@ -32,37 +32,19 @@
 └── README.md          # 项目说明
 ```
 
-## 环境配置（.env）
-
-使用 `.env` 管理配置：
-
-- 复制 `.env.example` 为 `.env`
-- 可配置变量：
-  - `PORT`：服务端监听端口（默认 3000）
-  - `CLIENT_ORIGIN`：允许的前端来源（单个）
-  - `ALLOWED_ORIGINS`：允许的多个来源（逗号分隔）
-  - `NODE_ENV`：运行环境（development/production）
-
-## 本地运行
+## 安装和运行
 
 ### 1. 安装依赖
 ```bash
 npm install
 ```
 
-### 2. 复制环境文件
-```bash
-cp .env.example .env
-# Windows PowerShell:
-# Copy-Item .env.example .env
-```
-
-### 3. 启动服务器
+### 2. 启动服务器
 ```bash
 npm start
 ```
 
-### 4. 访问应用
+### 3. 访问应用
 打开浏览器访问: http://localhost:3000
 
 ## 使用说明
@@ -99,27 +81,12 @@ npm run dev
 - Safari 12+
 - Edge 79+
 
-## Render 部署
-
-两种方式：
-
-- 使用 `render.yaml`（推荐）：将本仓库连接到 Render，Render 会自动识别并按配置部署。
-- 手动在控制台创建 Web Service：
-  - Environment 选择 `Node`
-  - Build Command：`npm install`
-  - Start Command：`npm start`
-  - Health Check Path：`/`
-  - 可在 Environment Variables 添加：`NODE_ENV=production`、`CLIENT_ORIGIN` 或 `ALLOWED_ORIGINS`
-
-部署后访问你的 Render 域名即可，例如：`https://realtime-chat-room.onrender.com`
-
 ## 注意事项
 
 - 用户名必须唯一，不能与当前在线用户重复
 - 消息长度限制为500个字符
 - 用户名长度限制为20个字符
 - 应用使用内存存储，服务器重启后聊天记录会丢失
-- 如跨域部署前端，请在 `.env` 或 Render 环境变量设置 `CLIENT_ORIGIN`/`ALLOWED_ORIGINS`
 
 ## 扩展功能建议
 

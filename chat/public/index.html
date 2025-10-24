@@ -26,6 +26,10 @@
                 <h2>实时聊天室</h2>
                 <div class="user-info">
                     <span id="current-user"></span>
+                    <span id="private-target" class="private-target" style="display:none;">
+                        私聊对象：<strong id="private-target-name"></strong>
+                        <button id="cancel-private-btn" class="cancel-private">取消私聊</button>
+                    </span>
                     <button id="logout-btn">退出</button>
                 </div>
             </div>
@@ -34,6 +38,7 @@
                 <!-- 在线用户列表 -->
                 <div class="users-panel">
                     <h3>在线用户 (<span id="user-count">0</span>)</h3>
+                    <div class="users-hint">点击用户名可发起私聊</div>
                     <ul id="users-list"></ul>
                 </div>
 
@@ -60,13 +65,8 @@
         </div>
     </div>
 
-    <!-- 配置文件：可设定 window.SOCKET_URL 指向后端 Socket 服务 -->
-    <script src="config.js"></script>
-    
-    <!-- 使用 CDN 加载 Socket.IO 客户端库，避免同源路径在前端托管下不可用 -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-9HfWQnYg8xQ5a5L4yHqP8Q7vVQw7I7kRkQeC8iFZ8v2D9+fS4bJQf4u0H8qkUqK0" crossorigin="anonymous"></script>
-    
-    <!-- 业务脚本 -->
+    <!-- Socket.IO客户端库 -->
+    <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

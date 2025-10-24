@@ -1,6 +1,5 @@
-// Socket.IO连接（支持跨域后端）
-const SOCKET_URL = (typeof window !== 'undefined' && window.SOCKET_URL && window.SOCKET_URL.trim()) ? window.SOCKET_URL.trim() : undefined;
-const socket = SOCKET_URL ? io(SOCKET_URL, { transports: ['websocket', 'polling'], withCredentials: false }) : io();
+// Socket.IO连接
+const socket = io();
 
 // DOM元素
 const loginContainer = document.getElementById('login-container');
@@ -16,11 +15,17 @@ const messagesContainer = document.getElementById('messages-container');
 const messageInput = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 const typingIndicator = document.getElementById('typing-indicator');
+const privateTargetWrap = document.getElementById('private-target');
+const privateTargetName = document.getElementById('private-target-name');
+const cancelPrivateBtn = document.getElementById('cancel-private-btn');
 
 // 全局变量
 let username = '';
 let typingTimer;
 let isTyping = false;
+let privateTarget = null; // 当前私聊对象
+let unreadCount = 0;
+const defaultTitle = document.title;
 
 // 初始化事件监听器
 function initEventListeners() {
@@ -46,6 +51,45 @@ function initEventListeners() {
     // 输入状态检测
     messageInput.addEventListener('input', handleTyping);
     messageInput.addEventListener('blur', stopTyping);
+
+    // 用户列表委托点击以设置私聊
+    usersList.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        const targetName = li.dataset.username || li.textContent.trim();
+        if (!targetName || targetName === username) {
+            // 点击自己或空白则取消私聊
+            clearPrivateTarget();
+            return;
+        }
+        setPrivateTarget(targetName);
+        // 高亮选中项
+        Array.from(usersList.children).forEach(node => node.classList.remove('active'));
+        li.classList.add('active');
+    });
+
+    // 取消私聊
+    cancelPrivateBtn.addEventListener('click', clearPrivateTarget);
+
+    // 未读消息计数：标签页可见性变化
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            resetUnread();
+        }
+    });
+}
+
+function setPrivateTarget(name) {
+    privateTarget = name;
+    privateTargetName.textContent = name;
+    privateTargetWrap.style.display = 'inline-flex';
+}
+
+function clearPrivateTarget() {
+    privateTarget = null;
+    privateTargetName.textContent = '';
+    privateTargetWrap.style.display = 'none';
+    Array.from(usersList.children).forEach(node => node.classList.remove('active'));
 }
 
 // 加入聊天室
@@ -79,7 +123,12 @@ function sendMessage() {
         return;
     }
 
-    socket.emit('chat-message', { message });
+    if (privateTarget) {
+        socket.emit('private-message', { to: privateTarget, message });
+    } else {
+        socket.emit('chat-message', { message });
+    }
+
     messageInput.value = '';
     stopTyping();
 }
@@ -117,7 +166,10 @@ function logout() {
     usersList.innerHTML = '';
     userCount.textContent = '0';
     username = '';
+    clearPrivateTarget();
     errorMessage.textContent = '';
+    resetUnread();
+    localStorage.removeItem('chat_username');
     
     // 重新连接
     setTimeout(() => {
@@ -143,6 +195,18 @@ function addMessage(data, type = 'other') {
             <div class="message-content">${data.message}</div>
             <div class="timestamp">${data.timestamp}</div>
         `;
+    } else if (type === 'private') {
+        const isOwn = data.from === username;
+        messageDiv.className = `message ${isOwn ? 'own' : 'other'} private`;
+        const displayName = isOwn ? `${data.from} → ${data.to}` : `${data.from} → 你`;
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <span class="username">${displayName}</span>
+                <span class="badge private">私聊</span>
+                <span class="timestamp">${data.timestamp}</span>
+            </div>
+            <div class="message-content">${escapeHtml(data.message)}</div>
+        `;
     } else {
         const isOwn = data.username === username;
         messageDiv.className = `message ${isOwn ? 'own' : 'other'}`;
@@ -158,6 +222,20 @@ function addMessage(data, type = 'other') {
 
     messagesContainer.appendChild(messageDiv);
     scrollToBottom();
+
+    // 更新未读计数
+    if (document.hidden) {
+        unreadCount += 1;
+        updateTitleUnread();
+    }
+}
+
+// 渲染历史消息（公共消息）
+function renderHistory(history) {
+    messagesContainer.innerHTML = '';
+    if (Array.isArray(history)) {
+        history.forEach(item => addMessage(item));
+    }
 }
 
 // 更新在线用户列表
@@ -168,6 +246,7 @@ function updateUsersList(users) {
     users.forEach(user => {
         const li = document.createElement('li');
         li.textContent = user;
+        li.setAttribute('data-username', user);
         if (user === username) {
             li.style.fontWeight = 'bold';
             li.style.color = '#667eea';
@@ -188,9 +267,24 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function updateTitleUnread() {
+    document.title = unreadCount > 0 ? `(${unreadCount}) ${defaultTitle}` : defaultTitle;
+}
+
+function resetUnread() {
+    unreadCount = 0;
+    updateTitleUnread();
+}
+
 // Socket.IO事件监听器
 socket.on('connect', () => {
     console.log('连接到服务器');
+    // 自动加入：如果有本地用户名且当前未进入聊天页
+    const saved = localStorage.getItem('chat_username');
+    if (saved && chatContainer.style.display === 'none') {
+        usernameInput.value = saved;
+        joinChat();
+    }
 });
 
 socket.on('disconnect', () => {
@@ -215,6 +309,12 @@ socket.on('user-list', (users) => {
     currentUser.textContent = username;
     updateUsersList(users);
     messageInput.focus();
+    localStorage.setItem('chat_username', username);
+});
+
+// 历史消息
+socket.on('history', (history) => {
+    renderHistory(history);
 });
 
 // 更新用户列表
@@ -222,7 +322,7 @@ socket.on('update-user-list', (users) => {
     updateUsersList(users);
 });
 
-// 接收聊天消息
+// 接收公共聊天消息
 socket.on('chat-message', (data) => {
     addMessage(data);
 });
@@ -244,6 +344,15 @@ socket.on('user-typing', (data) => {
     } else {
         typingIndicator.textContent = '';
     }
+});
+
+// 私聊消息
+socket.on('private-message', (data) => {
+    addMessage(data, 'private');
+});
+
+socket.on('private-error', (err) => {
+    showError(err.message || '私聊失败');
 });
 
 // 初始化应用

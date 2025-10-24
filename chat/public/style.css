@@ -331,3 +331,53 @@ body {
 .users-panel::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+/* 私聊状态与提示样式 */
+.private-target {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    font-weight: normal;
+}
+
+.cancel-private {
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.users-hint {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+#users-list li.active {
+    border-left-color: #e67e22;
+    background: #fff8f0;
+}
+
+/* 私聊消息样式 */
+.message.private {
+    outline: 2px dashed #e67e22;
+    outline-offset: 2px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 10px;
+}
+
+.badge.private {
+    background: #e67e22;
+    color: #fff;
+}
