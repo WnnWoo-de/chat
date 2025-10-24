@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时聊天室</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 登录界面 -->
+        <div id="login-container" class="login-container">
+            <div class="login-box">
+                <h2>加入聊天室</h2>
+                <div class="input-group">
+                    <input type="text" id="username-input" placeholder="请输入您的用户名" maxlength="20">
+                    <button id="join-btn">加入聊天</button>
+                </div>
+                <div id="error-message" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- 聊天界面 -->
+        <div id="chat-container" class="chat-container" style="display: none;">
+            <div class="chat-header">
+                <h2>实时聊天室</h2>
+                <div class="user-info">
+                    <span id="current-user"></span>
+                    <button id="logout-btn">退出</button>
+                </div>
+            </div>
+
+            <div class="chat-main">
+                <!-- 在线用户列表 -->
+                <div class="users-panel">
+                    <h3>在线用户 (<span id="user-count">0</span>)</h3>
+                    <ul id="users-list"></ul>
+                </div>
+
+                <!-- 聊天区域 -->
+                <div class="chat-panel">
+                    <div id="messages-container" class="messages-container">
+                        <div class="welcome-message">
+                            <p>欢迎来到实时聊天室！开始聊天吧～</p>
+                        </div>
+                    </div>
+
+                    <!-- 正在输入提示 -->
+                    <div id="typing-indicator" class="typing-indicator"></div>
+
+                    <!-- 消息输入区 -->
+                    <div class="message-input-container">
+                        <div class="input-group">
+                            <input type="text" id="message-input" placeholder="输入消息..." maxlength="500">
+                            <button id="send-btn">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Socket.IO客户端库 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
