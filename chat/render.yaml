@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: realtime-chat-room
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # 如需跨域部署前端，可设置 CLIENT_ORIGIN 或 ALLOWED_ORIGINS
+      # - key: CLIENT_ORIGIN
+      #   value: https://your-frontend.example.com
+      # - key: ALLOWED_ORIGINS
+      #   value: https://a.example.com,https://b.example.com

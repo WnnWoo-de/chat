@@ -1,5 +1,6 @@
-// Socket.IO连接
-const socket = io();
+// Socket.IO连接（支持跨域后端）
+const SOCKET_URL = (typeof window !== 'undefined' && window.SOCKET_URL && window.SOCKET_URL.trim()) ? window.SOCKET_URL.trim() : undefined;
+const socket = SOCKET_URL ? io(SOCKET_URL, { transports: ['websocket', 'polling'], withCredentials: false }) : io();
 
 // DOM元素
 const loginContainer = document.getElementById('login-container');

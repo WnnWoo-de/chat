@@ -60,8 +60,13 @@
         </div>
     </div>
 
-    <!-- Socket.IO客户端库 -->
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- 配置文件：可设定 window.SOCKET_URL 指向后端 Socket 服务 -->
+    <script src="config.js"></script>
+    
+    <!-- 使用 CDN 加载 Socket.IO 客户端库，避免同源路径在前端托管下不可用 -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-9HfWQnYg8xQ5a5L4yHqP8Q7vVQw7I7kRkQeC8iFZ8v2D9+fS4bJQf4u0H8qkUqK0" crossorigin="anonymous"></script>
+    
+    <!-- 业务脚本 -->
     <script src="script.js"></script>
 </body>
 </html>

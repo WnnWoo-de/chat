@@ -3,9 +3,19 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 
+require('dotenv').config();
+
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+
+// Socket.IO CORS 配置（支持 .env 中的 CLIENT_ORIGIN 或 ALLOWED_ORIGINS）
+const allowedOrigins = process.env.CLIENT_ORIGIN
+  ? [process.env.CLIENT_ORIGIN]
+  : (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim()) : undefined);
+
+const io = socketIo(server, {
+  cors: allowedOrigins ? { origin: allowedOrigins, methods: ['GET','POST'] } : undefined
+});
 
 // 存储在线用户信息
 const onlineUsers = new Map();
